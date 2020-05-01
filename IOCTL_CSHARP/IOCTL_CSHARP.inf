@@ -1,0 +1,86 @@
+;
+; IOCTL_CSHARP.inf
+;
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=Sample ; TODO: edit Class
+ClassGuid={78A1C341-4539-11d3-B88D-00C04FAD5171} ; TODO: edit ClassGuid
+Provider=%ManufacturerName%
+CatalogFile=IOCTL_CSHARP.cat
+DriverVer= ; TODO: set DriverVer in stampinf property pages
+
+[DestinationDirs]
+DefaultDestDir = 12
+IOCTL_CSHARP_Device_CoInstaller_CopyFiles = 11
+
+; ================= Class section =====================
+
+[ClassInstall32]
+Addreg=SampleClassReg
+
+[SampleClassReg]
+HKR,,,0,%ClassName%
+HKR,,Icon,,-5
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+IOCTL_CSHARP.sys  = 1,,
+WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll=1 ; make sure the number matches with SourceDisksNames
+
+;*****************************************
+; Install Section
+;*****************************************
+
+[Manufacturer]
+%ManufacturerName%=Standard,NT$ARCH$
+
+[Standard.NT$ARCH$]
+%IOCTL_CSHARP.DeviceDesc%=IOCTL_CSHARP_Device, Root\IOCTL_CSHARP ; TODO: edit hw-id
+
+[IOCTL_CSHARP_Device.NT]
+CopyFiles=Drivers_Dir
+
+[Drivers_Dir]
+IOCTL_CSHARP.sys
+
+;-------------- Service installation
+[IOCTL_CSHARP_Device.NT.Services]
+AddService = IOCTL_CSHARP,%SPSVCINST_ASSOCSERVICE%, IOCTL_CSHARP_Service_Inst
+
+; -------------- IOCTL_CSHARP driver install sections
+[IOCTL_CSHARP_Service_Inst]
+DisplayName    = %IOCTL_CSHARP.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\IOCTL_CSHARP.sys
+
+;
+;--- IOCTL_CSHARP_Device Coinstaller installation ------
+;
+
+[IOCTL_CSHARP_Device.NT.CoInstallers]
+AddReg=IOCTL_CSHARP_Device_CoInstaller_AddReg
+CopyFiles=IOCTL_CSHARP_Device_CoInstaller_CopyFiles
+
+[IOCTL_CSHARP_Device_CoInstaller_AddReg]
+HKR,,CoInstallers32,0x00010000, "WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll,WdfCoInstaller"
+
+[IOCTL_CSHARP_Device_CoInstaller_CopyFiles]
+WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll
+
+[IOCTL_CSHARP_Device.NT.Wdf]
+KmdfService =  IOCTL_CSHARP, IOCTL_CSHARP_wdfsect
+[IOCTL_CSHARP_wdfsect]
+KmdfLibraryVersion = $KMDFVERSION$
+
+[Strings]
+SPSVCINST_ASSOCSERVICE= 0x00000002
+ManufacturerName="<Your manufacturer name>" ;TODO: Replace with your manufacturer name
+ClassName="Samples" ; TODO: edit ClassName
+DiskName = "IOCTL_CSHARP Installation Disk"
+IOCTL_CSHARP.DeviceDesc = "IOCTL_CSHARP Device"
+IOCTL_CSHARP.SVCDESC = "IOCTL_CSHARP Service"
